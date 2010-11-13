@@ -3678,7 +3678,7 @@ YAHOO.extend(YAHOO.widget.MenuNode, YAHOO.widget.TextNode, {
  * @param oParent {YAHOO.widget.Node} this node's parent node
  * @param expanded {boolean} the initial expanded/collapsed state (deprecated; use oData.expanded) 
  * @param hasIcon {boolean} specifies whether or not leaf nodes should
- * be rendered with or without a horizontal line line and/or toggle icon. If the icon
+ * be rendered with or without a horizontal line and/or toggle icon. If the icon
  * is not displayed, the content fills the space it would have occupied.
  * This option operates independently of the leaf node presentation logic
  * for dynamic nodes.
@@ -3722,7 +3722,7 @@ YAHOO.extend(HN, YAHOO.widget.Node, {
 
     /**
      * Sets up the node label
-     * @property initContent
+     * @method initContent
      * @param oData {object} An html string or object containing an html property
      * @param hasIcon {boolean} determines if the node will be rendered with an
      * icon or not
@@ -3736,7 +3736,7 @@ YAHOO.extend(HN, YAHOO.widget.Node, {
 
     /**
      * Synchronizes the node.html, and the node's content
-     * @property setHtml
+     * @method setHtml
      * @param o {object |string | HTMLElement } An html string, an object containing an html property or an HTML element
      */
     setHtml: function(o) {
