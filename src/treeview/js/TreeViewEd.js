@@ -33,7 +33,7 @@
         buttonsContainer:null,
         node:null, // which Node is being edited
         saveOnEnter:true,
-		oldValue:undefined
+        oldValue:undefined
         // Each node type is free to add its own properties to this as it sees fit.
     };
     
@@ -57,28 +57,28 @@
      * @private
     */
 
-	TVproto._initEditor = function () {
-		/** 
-	 	* Fires when the user clicks on the ok button of a node editor
-	 	* @event editorSaveEvent 
-	 	* @type CustomEvent 
-	 	* @param oArgs.newValue {mixed} the new value just entered 
-	 	* @param oArgs.oldValue {mixed} the value originally in the tree 
-	 	* @param oArgs.node {YAHOO.widget.Node} the node that has the focus 
-	        * @for YAHOO.widget.TreeView
-	 	*/ 
-	 	this.createEvent("editorSaveEvent", this); 
-		
-		/** 
-	 	* Fires when the user clicks on the cancel button of a node editor
-	 	* @event editorCancelEvent 
-	 	* @type CustomEvent 
-	 	* @param {YAHOO.widget.Node} node the node that has the focus 
-	        * @for YAHOO.widget.TreeView
-	 	*/ 
-	 	this.createEvent("editorCancelEvent", this); 
+    TVproto._initEditor = function () {
+        /** 
+         * Fires when the user clicks on the ok button of a node editor
+         * @event editorSaveEvent 
+         * @type CustomEvent 
+         * @param oArgs.newValue {mixed} the new value just entered 
+         * @param oArgs.oldValue {mixed} the value originally in the tree 
+         * @param oArgs.node {YAHOO.widget.Node} the node that has the focus 
+            * @for YAHOO.widget.TreeView
+         */ 
+         this.createEvent("editorSaveEvent", this); 
+        
+        /** 
+         * Fires when the user clicks on the cancel button of a node editor
+         * @event editorCancelEvent 
+         * @type CustomEvent 
+         * @param {YAHOO.widget.Node} node the node that has the focus 
+            * @for YAHOO.widget.TreeView
+         */ 
+         this.createEvent("editorCancelEvent", this); 
 
-	};
+    };
 
     /**
     * Entry point of the editing plug-in.  
@@ -89,7 +89,7 @@
      * @for YAHOO.widget.TreeView
      * @private
     */
-	
+    
     
     
     TVproto._nodeEditing = function (node) {
@@ -98,10 +98,10 @@
             editorData.active = true;
             editorData.whoHasIt = this;
             if (!editorData.nodeType) {
-				// Fixes: http://yuilibrary.com/projects/yui2/ticket/2528945
+                // Fixes: http://yuilibrary.com/projects/yui2/ticket/2528945
                 editorData.editorPanel = ed = this.getEl().appendChild(document.createElement('div'));
                 Dom.addClass(ed,'ygtv-label-editor');
-				ed.tabIndex = 0;
+                ed.tabIndex = 0;
 
                 buttons = editorData.buttonsContainer = ed.appendChild(document.createElement('div'));
                 Dom.addClass(buttons,'ygtv-button-container');
@@ -113,9 +113,9 @@
                 button.innerHTML = ' ';
                 Event.on(buttons, 'click', function (ev) {
                     var target = Event.getTarget(ev),
-						editorData = TV.editorData,
-						node = editorData.node,
-						self = editorData.whoHasIt;
+                        editorData = TV.editorData,
+                        node = editorData.node,
+                        self = editorData.whoHasIt;
                     self.logger.log('click on editor');
                     if (Dom.hasClass(target,'ygtvok')) {
                         node.logger.log('ygtvok');
@@ -135,7 +135,7 @@
                 Event.on(ed,'keydown',function (ev) {
                     var editorData = TV.editorData,
                         KEY = YAHOO.util.KeyListener.KEY,
-						self = editorData.whoHasIt;
+                        self = editorData.whoHasIt;
                     switch (ev.keyCode) {
                         case KEY.ENTER:
                             self.logger.log('ENTER');
@@ -162,10 +162,10 @@
                 Dom.removeClass(ed,'ygtv-edit-' + editorData.nodeType);
             }
             Dom.addClass(ed,' ygtv-edit-' + node._type);
-			// Fixes: http://yuilibrary.com/projects/yui2/ticket/2528945
+            // Fixes: http://yuilibrary.com/projects/yui2/ticket/2528945
             Dom.setStyle(ed,'display','block');
-			Dom.setXY(ed,Dom.getXY(node.getContentEl()));
-			// up to here
+            Dom.setXY(ed,Dom.getXY(node.getContentEl()));
+            // up to here
             ed.focus();
             node.fillEditorContainer(editorData);
 
@@ -187,7 +187,7 @@
         } else if (oArgs.node instanceof YAHOO.widget.Node) {
             oArgs.node.editNode();
         }
-		return false;
+        return false;
     };
     
     /**
@@ -202,20 +202,20 @@
         var ed = TV.editorData, 
             node = ed.node,
             close = true;
-		// http://yuilibrary.com/projects/yui2/ticket/2528946
-		// _closeEditor might now be called at any time, even when there is no label editor open
-		// so we need to ensure there is one.
-		if (!node || !ed.active) { return; }
+        // http://yuilibrary.com/projects/yui2/ticket/2528946
+        // _closeEditor might now be called at any time, even when there is no label editor open
+        // so we need to ensure there is one.
+        if (!node || !ed.active) { return; }
         if (save) { 
             close = ed.node.saveEditorValue(ed) !== false; 
         } else {
-			this.fireEvent( 'editorCancelEvent', node); 
-		}
-			
+            this.fireEvent( 'editorCancelEvent', node); 
+        }
+            
         if (close) {
             Dom.setStyle(ed.editorPanel,'display','none');  
             ed.active = false;
-            node.focus();
+            node._focusedItem.focus();
         }
     };
     
@@ -296,28 +296,28 @@
      */
     Nproto.saveEditorValue = function (editorData) {
         var node = editorData.node, 
-			value,
+            value,
             validator = node.tree.validator;
-			
-		value = this.getEditorValue(editorData);
+            
+        value = this.getEditorValue(editorData);
         
         if (Lang.isFunction(validator)) {
             value = validator(value,editorData.oldValue,node);
             if (Lang.isUndefined(value)) { 
-				return false; 
-			}
+                return false; 
+            }
         }
 
-		if (this.tree.fireEvent( 'editorSaveEvent', {
-			newValue:value,
-			oldValue:editorData.oldValue,
-			node:node
-		}) !== false) {
-			this.displayEditedValue(value,editorData);
-		}
-	};
-	
-	
+        if (this.tree.fireEvent( 'editorSaveEvent', {
+            newValue:value,
+            oldValue:editorData.oldValue,
+            node:node
+        }) !== false) {
+            this.displayEditedValue(value,editorData);
+        }
+    };
+    
+    
     /**
     * Returns the value(s) from the input element(s) .
     * Should be overridden by each node type.
@@ -327,10 +327,10 @@
      * @for YAHOO.widget.Node
      */
 
-	 Nproto.getEditorValue = function (editorData) {
-	};
+     Nproto.getEditorValue = function (editorData) {
+    };
 
-	/**
+    /**
     * Finally displays the newly edited value(s) in the tree.
     * Should be overridden by each node type.
     * @method displayEditedValue
@@ -338,8 +338,8 @@
      * @param editorData {YAHOO.widget.TreeView.editorData}  a shortcut to the static object holding editing information
      * @for YAHOO.widget.Node
      */
-	Nproto.displayEditedValue = function (value,editorData) {
-	};
+    Nproto.displayEditedValue = function (value,editorData) {
+    };
     
     var TNproto = YAHOO.widget.TextNode.prototype;
     
@@ -367,7 +367,7 @@
             // if the last node edited was of the same time, reuse the input element.
             input = editorData.inputElement;
         }
-		editorData.oldValue = this.label;
+        editorData.oldValue = this.label;
         input.value = this.label;
         input.focus();
         input.select();
@@ -384,9 +384,9 @@
 
     TNproto.getEditorValue = function (editorData) {
         return editorData.inputElement.value;
-	};
+    };
 
-	/**
+    /**
     * Finally displays the newly edited value in the tree.
     * Overrides Node.displayEditedValue.
     * @method displayEditedValue
@@ -394,11 +394,11 @@
      * @param editorData {YAHOO.widget.TreeView.editorData}  a shortcut to the static object holding editing information
      * @for YAHOO.widget.TextNode
      */
-	TNproto.displayEditedValue = function (value,editorData) {
-		var node = editorData.node;
-		node.label = value;
-		node.getLabelEl().innerHTML = value;
-	};
+    TNproto.displayEditedValue = function (value,editorData) {
+        var node = editorData.node;
+        node.label = value;
+        node.getLabelEl().innerHTML = value;
+    };
 
     /**
     * Destroys the contents of the inline editor panel.

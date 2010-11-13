@@ -19,10 +19,8 @@ td.ygtvcell {
     border: none; 
 	padding: 0;
 }
-a.ygtvspacer {
-	text-decoration:none;
+td.ygtvcontent {
 	outline-style:none;
-	display:block;
 }
 
 
@@ -137,11 +135,6 @@ a.ygtvspacer {
 .ygtvfocus .ygtvlabel, .ygtvfocus .ygtvlabel:link, .ygtvfocus .ygtvlabel:visited, .ygtvfocus .ygtvlabel:hover {
 	background-color: #c0e0e0;
 }
-
-.ygtvfocus  a  {
-	outline-style:none;
-}
-
 
 .ygtvok {
     width:18px; height:22px; 

@@ -1,5 +1,43 @@
 TreeView - Release Notes
 
+2.9.0
+  * Fixes #2529120: Added WAI-ARIA support
+  * Focus happens on the mousedown event and not in the click event as before.
+  * The default action for nodes without the href property set is to toggle.
+    Focus is not longer part of the default action and cannot be canceled.
+  * EnterKeyPressed event can cancel the default action by returning false.
+  * Fixed #2528946: label editor remains visible when clicked elsewhere in the tree.
+  * Modified keyboard handling to conform to the W3C recommendation:
+    http://www.w3.org/WAI/PF/aria-practices/#TreeView
+  * Changed keydown handler.  Functions to handle each individual key are stored in 
+    a hash table (TreeView.KeyboardActions) indexed by keyCode plus modifiers.
+  * Method _canHaveFocus is deprecated since all supported browsers handle tabIndex=-1
+    to attract focus.  Likewise, the invisible anchor behind the toggle item used 
+	to attract focus is no longer produced.
+  * Focus handler now sets tabIndex=0 on the item with focus, so tabbing will
+    eventually return the focus to the same item.  Initially, the first node gets tabIndex=0,
+	all the rest get tabIndex=-1
+  * Added WAI-ARIA attributes:
+      * Tree is marked as role=tree
+	  * Nodes are marked as role=treeitem
+	  * Siblings are marked as role=group
+	  * All other elements used for formatting are marked as role=presentation
+	  * aria-expanded reflects node state
+  * Fixed: Node.expandAll and Node.collapseAll toggle the children, but not the node itself.
+  * Fixed #2528590: The container for the whole Node now gets the classNames ygtv-expanded 
+    and ygtv-collapsed so that other elements beyond the toggle icon can be styled.
+  * Changed individual blur event listeners on individual nodes to the new focusin event 
+    on the document body.
+  * Fixed #2528736: Properties renderHidden and enableHighlight were serialized wrong in getNodeDefinition.
+  * Fixed #2463119: HTMLNodes can now get a reference to a DOM object instead of just a string with HTML.
+  * Fixed #2528945: Label editor is inaccessible when tree is on a modal dialog
+  * Fixed #2529131: When more than one TreeView has active label editors, clicking on the buttons
+    closed the wrong one.
+  * Added each() method to loop through all existing nodes.
+
+2.8.2
+  * No change
+
 2.8.1
   * No change
 

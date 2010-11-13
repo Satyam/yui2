@@ -131,7 +131,7 @@ YAHOO.extend(YAHOO.widget.TextNode, YAHOO.widget.Node, {
     // overrides YAHOO.widget.Node
     getContentHtml: function() { 
         var sb = [];
-        sb[sb.length] = this.href?'<a':'<span';
+        sb[sb.length] = this.href?'<a':'<span role="presentation"';
         sb[sb.length] = ' id="' + this.labelElId + '"';
         sb[sb.length] = ' class="' + this.labelStyle  + '"';
         if (this.href) {
