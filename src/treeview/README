@@ -5,7 +5,7 @@ TreeView - Release Notes
   * Focus happens on the mousedown event and not in the click event as before.
   * The default action for nodes without the href property set is to toggle.
     Focus is not longer part of the default action and cannot be canceled.
-  * EnterKeyPressed event can cancel the default action by returning false.
+  * enterKeyPressed event can cancel the default action by returning false.
   * Fixed #2528946: label editor remains visible when clicked elsewhere in the tree.
   * Modified keyboard handling to conform to the W3C recommendation:
     http://www.w3.org/WAI/PF/aria-practices/#TreeView

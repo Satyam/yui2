@@ -770,167 +770,30 @@ TV.prototype = {
             node = this.getNodeByElement(target),
             fn = null,
             key = (ev.charCode || ev.keyCode);
-        if (ev.altKey) {
-            return;
-        }
-        if (ev.shiftKey) {
-            key += SHIFT_KEY;
-        }
-        if (ev.ctrlKey) {
-            key += CTRL_KEY;
-        }
-        fn = TV.KeyboardActions[key];
-        if (!fn) {
-            if (/\w/.test(key)) {
-                fn = TV.KeyboardActions[-1];
-            }
-        }
-        
-        if (fn) {
-            Event.preventDefault(ev);
-            fn.call(this,node,target,ev);
-        }
-            
+		if (node) {
+			if (ev.altKey) {
+				return;
+			}
+			if (ev.shiftKey) {
+				key += SHIFT_KEY;
+			}
+			if (ev.ctrlKey) {
+				key += CTRL_KEY;
+			}
+			fn = TV.KeyboardActions[key];
+			if (!fn) {
+				if (/\w/.test(String.fromCharCode(key))) {
+					fn = TV.KeyboardActions[-1];
+				}
+			}
+			
+			if (fn) {
+				Event.preventDefault(ev);
+				fn.call(this,node,target,ev);
+			}
+        }    
     },
     
-/*    qqqq: function (node,ev) {    
-        var newNode = node,
-            self = this,
-            home = function() {
-                newNode = self.getRoot();
-                if (newNode.children.length) {
-                    newNode = newNode.children[0];
-                }
-            };
-
-        switch(ev.keyCode) {
-            case KEY.UP:
-                if (newNode) {
-                    if (newNode.previousSibling) {
-                        newNode = newNode.previousSibling;
-                    } else {
-                        newNode = newNode.parent;
-                    }
-                } else {
-                    home();
-                }
-                if (newNode) { newNode.focus(); }
-                Event.preventDefault(ev);
-                break;
-            case KEY.DOWN:
-                if (newNode) {
-                    if (newNode.nextSibling) {
-                        newNode = newNode.nextSibling;
-                    } else {
-                        newNode.expand();
-                        newNode = (newNode.children.length || null) && newNode.children[0];
-                    }
-                } else {
-                    home();
-                }
-                if (newNode) { newNode.focus();}
-                Event.preventDefault(ev);
-                break;
-            case KEY.LEFT:
-                if (newNode) {
-                    if (newNode.parent) {
-                        newNode = newNode.parent;
-                    } else {
-                        newNode = newNode.previousSibling;
-                    }
-                } else {
-                    home();
-                }
-                if (newNode) { newNode.focus();}
-                Event.preventDefault(ev);
-                break;
-            case KEY.RIGHT:
-                var moveFocusRight,
-                    focusOnExpand = function (newNode) {
-                        self.unsubscribe('expandComplete',focusOnExpand);
-                        moveFocusRight(newNode);
-                    };
-                moveFocusRight = function (newNode) {
-                    if (newNode.isDynamic() && !newNode.childrenRendered) {
-                        self.subscribe('expandComplete',focusOnExpand);
-                        newNode.expand();
-                        newNode = null;
-                    } else {
-                        newNode.expand();
-                        if (newNode.children.length) {
-                            newNode = newNode.children[0];
-                        } else {
-                            newNode = newNode.nextSibling;
-                        }
-                    }
-                    if (newNode) { newNode.focus();}
-                };
-                    
-                if (newNode) {
-                    moveFocusRight(newNode);
-                } else {
-                    home();
-                    if (newNode) { newNode.focus();}
-                }
-                Event.preventDefault(ev);
-                break;
-            case KEY.ENTER:
-                if (node) {
-                    if (node.href) {
-                        if (node.target) {
-                            window.open(node.href,node.target);
-                        } else {
-                            window.location(node.href);
-                        }
-                    } else {
-                        node.toggle();
-                    }
-                    this.fireEvent('enterKeyPressed',node);
-                    Event.preventDefault(ev);
-                }
-                break;
-            case KEY.HOME:
-                home();
-                newNode.focus();
-                Event.preventDefault(ev);
-                break;
-            case KEY.END:
-                newNode = newNode.parent.children;
-                newNode = newNode[newNode.length -1];
-                newNode.focus();
-                Event.preventDefault(ev);
-                break;
-            // case KEY.PAGE_UP:
-                // break;
-            // case KEY.PAGE_DOWN:
-                // break;
-            case 107:  // plus key
-                if (ev.shiftKey) {
-                    if (node) {
-                        node.parent.expandAll();
-                    } else {
-                        this.root.expandAll();
-                    }
-                } else {
-                    if (node) { node.expand(); }
-                }
-                break;
-            case 109: // minus key
-                if (ev.shiftKey) {
-                    if (node) {
-                        node.parent.collapseAll();
-                    } else {
-                        this.root.collapseAll();
-                    }
-                } else {
-                    if (node) { node.collapse(); }
-                }
-                break;
-            default:
-                break;
-        }
-    },
-    */     
     /**
      * Event listener for <code>focusin</code> event.
      * @method _onFocusIn
