@@ -8,7 +8,7 @@ TreeView - Release Notes
   * enterKeyPressed event can cancel the default action by returning false.
   * Fixed #2528946: label editor remains visible when clicked elsewhere in the tree.
   * Modified keyboard handling to conform to the W3C recommendation:
-    http://www.w3.org/WAI/PF/aria-practices/#TreeView
+    http://www.w3.org/WAI/PF/aria-practices/#TreeView, except for ctrl and shift operation to extend selection
   * Changed keydown handler.  Functions to handle each individual key are stored in 
     a hash table (TreeView.KeyboardActions) indexed by keyCode plus modifiers.
   * Method _canHaveFocus is deprecated since all supported browsers handle tabIndex=-1
@@ -34,6 +34,8 @@ TreeView - Release Notes
   * Fixed #2529131: When more than one TreeView has active label editors, clicking on the buttons
     closed the wrong one.
   * Added each() method to loop through all existing nodes.
+  * Added spaceKeyPressed event to complement enterKeyPressed and allow easy association
+    of pressing space to toggle highlight
 
 2.8.2
   * No change

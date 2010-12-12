@@ -1173,10 +1173,6 @@ YAHOO.widget.Node.prototype = {
             ].join(JOINT);
         }
         
-        if (this.tree.enableAriaHighlight) {
-            sb[sb.length] = ' aria-checked="false"';
-        }
-            
         sb[sb.length] = [
             '">',
             this.getContentHtml(),
@@ -1291,17 +1287,17 @@ YAHOO.widget.Node.prototype = {
         };
         expandParent(this);
         
-        var el = (this._type == 'RootNode'?this.getChildrenEl():this.getContentEl());
+        var el = this.getContentEl();
+		Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
+		this._focusHighlightedItems.push(el);
+		var toggleEl = el.previousSibling;
+		if (!Dom.hasClass(toggleEl,'ygtvdepthcell')) {
+			Dom.addClass(toggleEl, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
+			this._focusHighlightedItems.push(toggleEl);
+		}
         this._focusedItem = el;
-        el.focus();
         el.tabIndex = 0;
-        Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
-        this._focusHighlightedItems.push(el);
-        el = el.previousSibling;
-        if (!Dom.hasClass(el,'ygtvdepthcell')) {
-            Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
-            this._focusHighlightedItems.push(el);
-        }
+        el.focus();
         
         this.tree.fireEvent('focusChanged',{oldNode:currentFocus,newNode:this});
         return true;
@@ -1515,10 +1511,6 @@ YAHOO.widget.Node.prototype = {
         // Nodes might not be rendered until the parent is expanded so you have to check if they exist
         if (el) {
             el.className = el.className.replace(/\bygtv-highlight\d\b/gi,'ygtv-highlight' + this.highlightState);
-        }
-        el = this.getContentEl();
-        if (el) {
-            el.setAttribute('aria-checked',['false','true','mixed'][this.highlightState]);
         }
     }
     

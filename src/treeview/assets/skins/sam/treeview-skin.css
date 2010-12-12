@@ -18,11 +18,11 @@ table.ygtvtable {
 td.ygtvcell {
     border: none; 
 	padding: 0;
-}
-td.ygtvcontent {
 	outline-style:none;
 }
-
+td.ygtvcell a {
+	outline-style:none;
+}
 
 /* first or middle sibling, no children */
 .ygtvtn {
@@ -120,6 +120,10 @@ td.ygtvcontent {
     text-decoration: none;
     background-color: white; /* workaround for IE font smoothing bug */
 	cursor:pointer;
+}
+
+.ygtvfocus a.ygtvlabel {
+	color:darkblue;
 }
 
 .ygtvcontent {

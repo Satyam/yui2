@@ -137,6 +137,7 @@ YAHOO.extend(YAHOO.widget.TextNode, YAHOO.widget.Node, {
         if (this.href) {
             sb[sb.length] = ' href="' + this.href + '"';
             sb[sb.length] = ' target="' + this.target + '"';
+            sb[sb.length] = ' tabindex="-1"';
         } 
         if (this.title) {
             sb[sb.length] = ' title="' + this.title + '"';

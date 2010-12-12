@@ -142,14 +142,6 @@ TV.prototype = {
     singleNodeHighlight: false,
     
     /**
-    * Enables the setting of the <code>aria-checked</code> attribute to signal highlighting/selection
-    * @property enableAriaHighlight
-    * @type boolean
-    * @default false
-    */
-    enableAriaHighlight: false,
-    
-    /**
     * A reference to the Node that is currently highlighted.
     * It is only meaningful if singleNodeHighlight is enabled
     * @property _currentlyHighlighted
@@ -344,11 +336,17 @@ TV.prototype = {
          * @type CustomEvent
          * @param {YAHOO.widget.Node} node the node that has the focus
          */
-        this.createEvent("enterKeyPressed", {
-            scope:this,
-            onSubscribeCallback: this._initAriaHighlighting
-        });
+        this.createEvent("enterKeyPressed");
         
+        /**
+         * Fires when the Space key is pressed on a node that has the focus
+         * @event spaceKeyPressed
+         * @type CustomEvent
+         * @param {YAHOO.widget.Node} oArgs.node the node that has the focus
+         * @param {HTMLEvent} oArgs.event the event object from the browser
+         */
+        this.createEvent("spaceKeyPressed");
+
         /**
          * Fires when the label in a TextNode or MenuNode or content in an HTMLNode receives a Click.
          * The listener may return false to cancel the default action,
@@ -358,10 +356,7 @@ TV.prototype = {
          * @param oArgs.event  {HTMLEvent} The event object
          * @param oArgs.node {YAHOO.widget.Node} node the node that was clicked
          */
-        this.createEvent("clickEvent", {
-            scope:this,
-            onSubscribeCallback: this._initAriaHighlighting
-        });
+        this.createEvent("clickEvent");
         
         /**
          * Fires when the focus receives the focus, when it changes from a Node 
@@ -385,7 +380,6 @@ TV.prototype = {
             scope:this,
             onSubscribeCallback: function(type, aArgs) {
                 this.scope._hasDblClickSubscriber = true;
-                this.scope._initAriaHighlighting.call(this, type, aArgs);
             }
         });
         
@@ -784,7 +778,11 @@ TV.prototype = {
         var target = Event.getTarget(ev),
             node = this.getNodeByElement(target),
             fn = null,
-            key = (ev.charCode || ev.keyCode);
+            key = Event.getCharCode(ev);
+			
+		if ((target.tagName.toUpperCase() == 'INPUT' && target.type.toUpperCase() == 'TEXT')  || target.tagName.toUpperCase() == 'TEXTAREA') {
+			return;
+		}
 		if (node) {
 			if (ev.altKey) {
 				return;
@@ -797,7 +795,7 @@ TV.prototype = {
 			}
 			fn = TV.KeyboardActions[key];
 			if (!fn) {
-				if (/\w/.test(String.fromCharCode(key))) {
+				if (!ev.ctrlKey && !ev.altKey && /\w/.test(String.fromCharCode(key))) {
 					fn = TV.KeyboardActions[-1];
 				}
 			}
@@ -1309,27 +1307,7 @@ TV.prototype = {
         return false;
     },
     
-    /**
-    * Event listener for subscribers to clickEvent, dblClickEvent and EnterKeyPressed.
-    * Checks if any of these was set to onEventToggleHighlight and sets enableAriaHighlight 
-    * and sets the aria-checked attribute to false on all nodes
-    * @method _initAriaHighlighting
-    * @param type {string} type of event listening to
-    * @param aArgs {array} arguments provided by the event
-    * @private
-    */
-    _initAriaHighlighting: function(type, aArgs) {
-        if (aArgs[0] === this.scope.onEventToggleHighlight) {
-            this.scope.enableAriaHighlight = true;
-            var el;
-            this.scope.each(function(node) {
-                el = node.getContentEl();
-                if (el) {
-                    el.setAttribute('aria-checked',['false','true','mixed'][node.highlightState]);
-                }        
-            });
-        }
-    },
+
     
     /** Unhighlights all highlighted or partially highlighted nodes
      * @method unhighlightAll
@@ -1343,27 +1321,6 @@ TV.prototype = {
         });
     },
     
-    /**
-     * Moves the focus up in response to keyboard event
-     * @method _keyMoveUp
-     * @param node {YAHOO.widget.Node} current node
-     * @return {YAHOO.widget.Node} Node instance moved to or null if already at the top
-     * @private
-     */
-    _keyMoveUp: function (node) {
-        if (node.previousSibling) {
-            node = node.previousSibling;
-            while (node.expanded && node.children.length) {
-                node = node.children[node.children.length -1];
-            }
-        } else {
-            node = node.parent;
-        }
-        if (node){
-            node.focus();
-        }
-        return node;
-    },
     
     /**
      * Moves the focus down in response to keyboard event
@@ -1390,46 +1347,8 @@ TV.prototype = {
             node.focus();
         }
         return node;
-    },
-    
-    /**
-     * Moves the focus right in response to keyboard event
-     * @method _keyMoveRight
-     * @param node {YAHOO.widget.Node} current node
-     * @return {YAHOO.widget.Node} Node instance moved to or null if already at an leaf node
-     * @private
-     */
-    _keyMoveRight: function (node) {
-        if (node.children.length) {
-            if (node.expanded) {
-                node = node.children[0];
-                node.focus();
-            } else {
-                node.expand();
-            }
-        }
-        return node;
-    },
-    /**
-     * Moves the focus left in response to keyboard event
-     * @method _keyMoveLeft
-     * @param node {YAHOO.widget.Node} current node
-     * @return {YAHOO.widget.Node} Node instance moved to or null if already at the top most nodes
-     * @private
-     */
-    _keyMoveLeft: function (node) {
-        if (node.expanded && node.children.length) {
-            node.collapse();
-            return;
-        }
-        node = node.parent;
-        if (node){
-            node.focus();
-        }
-        return node;
     }
-        
-
+    
 };
 
 /* Backwards compatibility aliases */
@@ -1528,7 +1447,7 @@ TV.KeyboardActions = KA;
 
 // W3C: Typing a letter key moves focus to the next instance of a visible node whose title begins with that letter.
 KA[-1] = function (node, target, ev) {
-	var key = String.fromCharCode(ev.charCode || ev.keyCode).toUpperCase();
+	var key = String.fromCharCode(Event.getCharCode(ev)).toUpperCase();
 	while ((node = this._keyMoveDown(node, true))) {  // yes, it is an assignment
 		if (node.label && node.label.charAt(0).toUpperCase() == key) {
 			node.focus();
@@ -1541,30 +1460,50 @@ KA[-1] = function (node, target, ev) {
 // W3C: Up Arrow and Down arrow keys move between visible nodes.
 KA[KEY.UP] = function (node, target, ev) {
     this.logger.log('Up Arrow');
-    this._keyMoveUp(node);
-    this.unhighlightAll();
+	if (node.previousSibling) {
+		node = node.previousSibling;
+		while (node.expanded && node.children.length) {
+			node = node.children[node.children.length -1];
+		}
+	} else {
+		node = node.parent;
+	}
+	if (node){
+		node.focus();
+	}
 };
 
 // W3C: Up Arrow and Down arrow keys move between visible nodes.
 KA[KEY.DOWN] = function (node, target, ev) {
     this.logger.log('Down Arrow');
     this._keyMoveDown(node);
-    this.unhighlightAll();
 };
 
 // W3C: Left arrow key on an expanded node closes the node.
 // W3C: Left arrow key on a closed or end node moves focus to the node's parent.
 KA[KEY.LEFT] = function (node, target, ev) {
     this.logger.log('left arrow');
-    this._keyMoveLeft(node);
-    this.unhighlightAll();
+	if (node.expanded && node.children.length) {
+		node.collapse();
+		return;
+	}
+	node = node.parent;
+	if (node){
+		node.focus();
+	}
 };
 
 // W3C: Right arrow key expands a closed node, moves to the first child of an open node, or does nothing on an end node.
 KA[KEY.RIGHT] = function (node, target, ev) {
     this.logger.log('right arrow');
-    this._keyMoveRight(node);
-    this.unhighlightAll();
+	if (node.children.length) {
+		if (node.expanded) {
+			node = node.children[0];
+			node.focus();
+		} else {
+			node.expand();
+		}
+	}
 };
 
 // W3C: Enter key performs the default action on end nodes.
@@ -1584,6 +1523,10 @@ KA[KEY.ENTER] = function (node, target, ev) {
             node.toggle();
         }
     }
+};
+// Non-standard, just fires the event
+KA[KEY.SPACE] = function (node, target, ev) {
+	this.fireEvent('spaceKeyPressed', {node:node,event:ev});
 };
 
 // W3C: Home key moves to the top node in the tree view.
@@ -1607,93 +1550,6 @@ KA[KEY.END] = function (node, target, ev) {
 
     if (newNode !== node){
         newNode.focus();
-    }
-};
-
-// W3C: Ctrl+Arrow to an item with the keyboard focuses the item (but does not select it). 
-// W3C: Previous selections are maintained, provided that the Ctrl key is not released or that some other keyboard function is not performed.
-KA[CTRL_KEY + KEY.LEFT] = function (node, target, ev) {
-    this.logger.log('Ctrl-left arrow');
-    this._keyMoveLeft(node);
-};
-
-
-
-// W3C: Ctrl+Arrow to an item with the keyboard focuses the item (but does not select it). 
-// W3C: Previous selections are maintained, provided that the Ctrl key is not released or that some other keyboard function is not performed.
-KA[CTRL_KEY + KEY.RIGHT] = function (node, target, ev) {
-    this.logger.log('Ctrl-right arrow');
-    this._keyMoveRight(node);
-};
-
-// W3C: Ctrl+Arrow to an item with the keyboard focuses the item (but does not select it). 
-// W3C: Previous selections are maintained, provided that the Ctrl key is not released or that some other keyboard function is not performed.
-KA[CTRL_KEY + KEY.UP] = function (node, target, ev) {
-    this.logger.log('Ctrl-up arrow');
-    this._keyMoveUp(node);
-};
-
-// W3C: Ctrl+Arrow to an item with the keyboard focuses the item (but does not select it). 
-// W3C: Previous selections are maintained, provided that the Ctrl key is not released or that some other keyboard function is not performed.
-KA[CTRL_KEY + KEY.DOWN] = function (node, target, ev) {
-    this.logger.log('Ctrl-down arrow');
-    this._keyMoveDown(node);
-};
-
-// W3C: Ctrl+Space with focus on an item toggles the selection of the item.
-KA[CTRL_KEY + KEY.SPACE] = function (node, target, ev) {
-    this.logger.log('Ctrl-space key');
-    node.toggleHighlight();
-};
-
-// W3C: Shift+Up Arrow extends selection up one node.
-KA[SHIFT_KEY + KEY.UP] = function (node, target, ev) {
-    this.logger.log('Shift-up arrow');
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-    node = this._keyMoveUp(node);
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-};
-
-
-// W3C: Shift+Down Arrow extends selection down one node
-KA[SHIFT_KEY + KEY.DOWN] = function (node, target, ev) {
-    this.logger.log('Shift-down arrow');
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-    node = this._keyMoveDown(node);
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-};
-
-// W3C: Shift+Home extends selection up to the top-most node.
-KA[SHIFT_KEY + KEY.HOME] = function (node, target, ev) {
-    this.logger.log('Shift-home key');
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-    while ((node = this._keyMoveUp(node))) { // Yes, it is an assignment
-        if (node.highlightState!=1) {
-            node.highlight();
-        }
-    }
-};
-
-// W3C: Shift+PageDown extends selection down to the last node.
-KA[SHIFT_KEY + KEY.PAGE_DOWN] = function (node, target, ev) {
-    this.logger.log('Shift-page down key');
-    if (node.highlightState!=1) {
-        node.highlight();
-    }
-    while ((node = this._keyMoveDown(node))) { // Yes, it is an assignment
-        if (node.highlightState!=1) {
-            node.highlight();
-        }
     }
 };
 
@@ -2908,10 +2764,6 @@ YAHOO.widget.Node.prototype = {
             ].join(JOINT);
         }
         
-        if (this.tree.enableAriaHighlight) {
-            sb[sb.length] = ' aria-checked="false"';
-        }
-            
         sb[sb.length] = [
             '">',
             this.getContentHtml(),
@@ -3026,17 +2878,17 @@ YAHOO.widget.Node.prototype = {
         };
         expandParent(this);
         
-        var el = (this._type == 'RootNode'?this.getChildrenEl():this.getContentEl());
+        var el = this.getContentEl();
+		Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
+		this._focusHighlightedItems.push(el);
+		var toggleEl = el.previousSibling;
+		if (!Dom.hasClass(toggleEl,'ygtvdepthcell')) {
+			Dom.addClass(toggleEl, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
+			this._focusHighlightedItems.push(toggleEl);
+		}
         this._focusedItem = el;
-        el.focus();
         el.tabIndex = 0;
-        Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
-        this._focusHighlightedItems.push(el);
-        el = el.previousSibling;
-        if (!Dom.hasClass(el,'ygtvdepthcell')) {
-            Dom.addClass(el, YAHOO.widget.TreeView.FOCUS_CLASS_NAME );
-            this._focusHighlightedItems.push(el);
-        }
+        el.focus();
         
         this.tree.fireEvent('focusChanged',{oldNode:currentFocus,newNode:this});
         return true;
@@ -3250,10 +3102,6 @@ YAHOO.widget.Node.prototype = {
         // Nodes might not be rendered until the parent is expanded so you have to check if they exist
         if (el) {
             el.className = el.className.replace(/\bygtv-highlight\d\b/gi,'ygtv-highlight' + this.highlightState);
-        }
-        el = this.getContentEl();
-        if (el) {
-            el.setAttribute('aria-checked',['false','true','mixed'][this.highlightState]);
         }
     }
     
@@ -3486,6 +3334,7 @@ YAHOO.extend(YAHOO.widget.TextNode, YAHOO.widget.Node, {
         if (this.href) {
             sb[sb.length] = ' href="' + this.href + '"';
             sb[sb.length] = ' target="' + this.target + '"';
+            sb[sb.length] = ' tabindex="-1"';
         } 
         if (this.title) {
             sb[sb.length] = ' title="' + this.title + '"';
@@ -3722,6 +3571,9 @@ YAHOO.extend(HN, YAHOO.widget.Node, {
         return def;
     
     }
+	, focus: function() {
+		HN.superclass.focus.apply(this,arguments);
+	}
 });
 
     /**

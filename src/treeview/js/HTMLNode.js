@@ -136,6 +136,9 @@ YAHOO.extend(HN, YAHOO.widget.Node, {
         return def;
     
     }
+	, focus: function() {
+		HN.superclass.focus.apply(this,arguments);
+	}
 });
 
     /**
