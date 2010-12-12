@@ -18,10 +18,10 @@ table.ygtvtable {
 td.ygtvcell {
     border: none; 
 	padding: 0;
-	ffoutline-style:none;
+	outline-style:none;
 }
 td.ygtvcell a {
-	ffoutline-style:none;
+	outline-style:none;
 }
 
 /* first or middle sibling, no children */

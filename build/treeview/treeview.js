@@ -763,9 +763,10 @@ TV.prototype = {
         var target = Event.getTarget(ev),
             node = this.getNodeByElement(target),
             fn = null,
-            key = Event.getCharCode(ev);
+            key = Event.getCharCode(ev),
+			tagName = target.tagName.toUpperCase();
 			
-		if ((target.tagName.toUpperCase() == 'INPUT' && target.type.toUpperCase() == 'TEXT')  || target.tagName.toUpperCase() == 'TEXTAREA') {
+		if (( tagName == 'INPUT' && target.type.toUpperCase() == 'TEXT')  || tagName == 'TEXTAREA') {
 			return;
 		}
 		if (node) {
